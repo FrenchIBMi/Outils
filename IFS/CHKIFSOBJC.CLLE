@@ -9,12 +9,12 @@ DCL        VAR(&BUF)       TYPE(*CHAR) LEN(4096)
 
 CHGVAR     VAR(&PATH) VALUE(&PARM *TCAT &NULL)           
 
-/* appel de la procedure stat dans QLECWI */
+/* appel de la procedure "stat" dans QLECWI */
 CALLPRC    PRC('stat') PARM(&PATH &BUF) +
              RTNVAL(&RTNVAL)
 /* code retour <> de 0 , le fichier n'existe pas */
 IF         COD(&RTNVAL *NE 0) THEN(SNDPGMMSG +
              MSGID(CPF9898) SGF(QCPFMSG) +
-           TCAT  MSGDTA('Objet* AT' !! &PARM !< ' non +
-             trouve.') MSGTYPE(*ESCAPE))
+           TCAT  MSGDTA('Objet ' *CAT &PARM *BCAT ' non +
+             trouvÃÂÃÂ©.') MSGTYPE(*ESCAPE))
 ENDPGM                                         

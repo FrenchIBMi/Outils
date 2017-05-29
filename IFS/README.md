@@ -1,0 +1,1 @@
+# CHIFSOBJ, verifie qu'un fichier stream existe

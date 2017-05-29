@@ -1,0 +1,260 @@
+     h DECEDIT('0,') DATEDIT(*DMY.) DFTACTGRP(*NO)
+      //----------------------------------------------------------------------
+      //Cree par : Gradot Florian
+      //Le       : 02/02/2015
+      //Communication TCP/IP avec les balances avec timeout + conversion
+      // ASCII EBCDIC
+      //----------------------------------------------------------------------
+      //----------------------------------------------------------------------
+      //Declaration des variables
+      //----------------------------------------------------------------------
+     d sock            S             10U 0
+     d p_connto        S               *
+     d addrlen         S             10I 0
+     d timelen         S             10I 0
+     d aIP             S             10U 0
+     d msg             S             50a
+     d carac           S             16a
+     d rc              S             10I 0
+     d request         S             60a
+     d recbuf          S             20a
+     D ReqLen          S             10I 0
+     D RecLen          S             10I 0
+     D readset         S             28a
+     D writeset        S             28a
+     D excpset         S             28a
+     D tv_len          S             10I 0
+     D p_errno         S               *
+     D timeout         S             10I 0 inz(5)
+     D CRLF            C                   x'0d25'
+      //----------------------------------------------------------------------
+      //Definition des procdures externes
+      //----------------------------------------------------------------------
+     D Translate       PR                  ExtPgm('QDCXLATE')
+     D    peLength                    5P 0 const
+     D    peBuffer                32766A   options(*varsize)
+     D    peTable                    10A   const
+     D
+     D get_errno       pr              *   ExtProc('__errno')
+     D
+      //----------------------------------------------------------------------
+      //Définition des ds
+      //----------------------------------------------------------------------
+
+     d/COPY QCPYSRC,SOCKET_H
+     d/COPY QCPYSRC,SIGNAL_H
+     d/COPY QCPYSRC,ERRNO_H
+     d
+      //----------------------------------------------------------------------
+      //Parametres d'entre
+      //----------------------------------------------------------------------
+     d PrmEntry        pr                  extpgm('IFSEXEMPLE')
+     d  host                         32a
+     d  port                          5
+     d  message                      10
+     d  retour                       20
+     d PrmEntry        pi
+     d  host                         32a
+     d  port                          5
+     d  message                      10
+     d  retour                       20
+
+      //----------------------------------------------------------------------
+      //Debut
+      //----------------------------------------------------------------------
+      /free
+       rc = close(0);
+       rc = close(1);
+       //Activation de la rception de messages
+       init_signals();
+
+       //---------------------------------------------------------------------
+       //Recuperation de l'adresse IP
+       //---------------------------------------------------------------------
+
+       aIP = inet_addr(%trim(host));
+
+       if aIP = INADDR_NONE;
+          p_hostent = gethostbyname(%trim(host));
+          if p_hostent <> *NULL;
+             aIP = h_addr;
+          endif;
+       endif;
+
+       //Cration du socket
+       if aIP <> INADDR_NONE;
+
+          //?---------------------------------------------------------------
+          //Cration du socket
+          //?---------------------------------------------------------------
+          sock = socket(AF_INET:SOCK_STREAM:IPPROTO_IP);
+
+          //si cration du socket ok
+          if sock >= 0;
+
+             addrlen  = %size(sockaddr);
+             p_connto = %alloc(addrlen);
+
+             p_sockaddr = p_connto;
+
+             sin_family = AF_INET;
+             sin_addr   = aIP;
+             sin_port   = %dec(port:5:0);
+             sin_zero   = *ALLx'00';
+
+             //------------------------------------------------------------
+             //Connexion au serveur
+             //------------------------------------------------------------
+             //si connexion ok
+             if tconnect(sock: p_connto: addrlen: timeout) >= 0;
+
+                //Initialisation et traduction de la requte
+                request = %trim(message) + CRLF;
+
+                reqlen = %len(%trim(request));
+                callp Translate(reqlen: request: 'QTCPASC');
+
+                //---------------------------------------------------------
+                //Envoi de la requte
+                //---------------------------------------------------------
+                rc = tsend(sock: %addr(request): reqlen: timeout);
+                if rc >= reqlen;
+                   timelen  = %size(timeval);
+                   p_timeval = %alloc(timelen);
+                   tv_sec = 0;
+                   tv_usec = 100000;
+                   callp select(0: *NULL: *NULL: *NULL:p_timeval);
+                  //------------------------------------------------------
+                  //Recuperation de la reponse
+                  //------------------------------------------------------
+                   Exsr receive_l;
+
+                   retour  = recbuf;
+
+                else;
+                   Msg = 'Envoi de la chaine impossible!';
+                   dsply msg;
+                Endif;
+             else;
+                Msg = 'Connexion au serveur impossible!';
+                dsply msg;
+             Endif;
+
+             //Fermeture du socket
+             rc = close(sock);
+          else;
+             msg = 'Erreur appel socket()!';
+             dsply msg;
+          Endif;
+       else;
+          Msg = 'Matriel introuvable!';
+       Endif;
+
+       *inlr = *on;
+
+       //--------------------------------------------------------------------
+       //Fin du programme
+       //--------------------------------------------------------------------
+       Begsr receive_l;
+          reclen = 0;
+          recbuf = *blanks;
+
+          rc = trecv(sock: %addr(carac): 20 :timeout);
+
+          if rc = -1;
+             callp close(sock);
+
+          else;
+             recbuf = carac;
+             reclen = %len(%trim(recbuf));
+
+             if reclen > 0;
+                callp Translate(reclen: recbuf: 'QTCPEBC');
+             Endif;
+
+          Endif;
+
+       Endsr;
+
+      /end-free
+      *-------------------------------------------------------
+      *Fonction de rception de donnes
+      *-------------------------------------------------------
+     P trecv           B
+     D trecv           PI            10I 0
+     D   sock                        10I 0 value
+     D   data                          *   value
+     D   size                        10I 0 value
+     D   timeout                     10I 0 value
+     D rc              s             10I 0
+      /free
+          alarm(timeout);
+          rc = recv(sock: data: size: 0);
+          alarm(0);
+          return rc;
+      /end-free
+     P                 E
+
+      *-------------------------------------------------------
+      *Fonction d'envoi de donnees
+      *-------------------------------------------------------
+     P tsend           B
+     D tsend           PI            10I 0
+     D   sock                        10I 0 value
+     D   data                          *   value
+     D   size                        10I 0 value
+     D   timeout                     10I 0 value
+     D rc              s             10I 0
+      /free
+          alarm(timeout);
+          rc = send(sock: data: size: 0);
+          alarm(0);
+          return rc;
+      /end-free
+     P                 E
+      *-------------------------------------------------------
+      *Fonction de connexion au systeme distant
+      *-------------------------------------------------------
+     P tconnect        B
+     D tconnect        PI            10I 0
+     D   sock                        10I 0 value
+     D   addr                          *   value
+     D   size                        10I 0 value
+     D   timeout                     10I 0 value
+     D rc              s             10I 0
+      /free
+          alarm(timeout);
+          rc = connect(sock: addr: size);
+          alarm(0);
+          return rc;
+      /end-free
+     P                 E
+      *-------------------------------------------------------
+      *Fonction de rception des messages
+      *-------------------------------------------------------
+     P got_alarm       B
+     D got_alarm       PI
+     D   signo                       10I 0 value
+      /free
+         // Do nothing. The connect() API will return
+         //  EINTR ("interrupted by signal") when the
+         //  signal is received.
+      /end-free
+      *-------------------------------------------------------
+      *Fonction d'activation reception de messages
+      *-------------------------------------------------------
+     P                 E
+     P
+     P init_signals    B
+     D init_signals    PI
+     D act             ds                  likeds(sigaction_t)
+      /free
+          Qp0sEnableSignals();
+          sigemptyset(act.sa_mask);
+          sigaddset(act.sa_mask: SIGALRM);
+          act.sa_handler   = %paddr(got_alarm);
+          act.sa_flags     = 0;
+          act.sa_sigaction = *NULL;
+          sigaction(SIGALRM: act: *omit);
+      /end-free
+     P                 E

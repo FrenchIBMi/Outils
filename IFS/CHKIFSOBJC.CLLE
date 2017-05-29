@@ -1,0 +1,21 @@
+PGM        PARM(&PARM)
+DCLPRCOPT  BNDSRVPGM((QLECWI))
+/* vÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©rification qu'un fichier de l'IFS existe */
+
+DCL        VAR(&PARM)      TYPE(*CHAR) LEN(256)
+DCL        VAR(&RTNVAL) TYPE(*int) LEN(4)
+DCL        VAR(&PATH)      TYPE(*CHAR) LEN(100)
+DCL        VAR(&NULL)      TYPE(*CHAR) LEN(1) VALUE(X'00')
+DCL        VAR(&BUF)       TYPE(*CHAR) LEN(4096)
+
+CHGVAR     VAR(&PATH) VALUE(&PARM *TCAT &NULL)
+
+/* appel dela procÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©dure stat dans QLECWI */
+CALLPRC    PRC('stat') PARM(&PATH &BUF) +
+             RTNVAL(&RTNVAL)
+/* code retour <> de 0 , le fichier nexiste pas */
+IF         COD(&RTNVAL *NE 0) THEN(SNDPGMMSG +
+             MSGID(CPF9898) SGF(QCPFMSG) +
+           TCAT  MSGDTA('Objet* AT' !! &PARM !< ' non +
+             trouvÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ©.') MSGTYPE(*ESCAPE))
+ENDPGM                                         

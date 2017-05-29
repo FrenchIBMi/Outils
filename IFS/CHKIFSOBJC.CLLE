@@ -16,5 +16,5 @@ CALLPRC    PRC('stat') PARM(&PATH &BUF) +
 IF         COD(&RTNVAL *NE 0) THEN(SNDPGMMSG +
              MSGID(CPF9898) SGF(QCPFMSG) +
            TCAT  MSGDTA('Objet ' *CAT &PARM *BCAT ' non +
-             trouvÃÂÃÂ©.') MSGTYPE(*ESCAPE))
+             trouvé.') MSGTYPE(*ESCAPE))
 ENDPGM                                         

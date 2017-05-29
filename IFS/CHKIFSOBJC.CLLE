@@ -1,6 +1,14 @@
 PGM        PARM(&PARM)
 DCLPRCOPT  BNDSRVPGM((QLECWI))
 
+DCL        VAR(&PARM)      TYPE(*CHAR) LEN(256)
+DCL        VAR(&RTNVAL) TYPE(*int) LEN(4)
+DCL        VAR(&PATH)      TYPE(*CHAR) LEN(100)
+DCL        VAR(&NULL)      TYPE(*CHAR) LEN(1) VALUE(X'00')
+DCL        VAR(&BUF)       TYPE(*CHAR) LEN(4096)
+
+CHGVAR     VAR(&PATH) VALUE(&PARM *TCAT &NULL)           
+
 /* appel de la procedure stat dans QLECWI */
 CALLPRC    PRC('stat') PARM(&PATH &BUF) +
              RTNVAL(&RTNVAL)

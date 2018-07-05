@@ -1,0 +1,93 @@
+**FREE
+ctl-opt decedit('0,') option(*nodebugio) datedit(*ymd.) dftactgrp(*no);
+
+//*******************************************************************
+//Créé par : Gradot Florian                                         *
+//Le       : 04/07/2018                                             *
+//*******************************************************************
+//-------------------------------------------------------------------
+// Programme qui va initialiser la valeur de ID d'une table
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//Définition des fichiers
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//Procédure externe
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//Clés
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//Variables
+//-------------------------------------------------------------------
+dcl-s ValeurID int(10:0);
+dcl-s requete char(500);
+dcl-s LaTable char(128);
+dcl-s LaBib char(128);
+dcl-s LeChamp char(128);
+//-------------------------------------------------------------------
+//Data structures
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//Paramètres
+//-------------------------------------------------------------------
+//-------------------------------------------------------------------
+//Début
+//-------------------------------------------------------------------
+
+// Récupération de tous les ID des bibliothèques de simu
+exec sql
+   DECLARE curseur SCROLL CURSOR FOR
+   SELECT TABLE_NAME, COLUMN_NAME, TABLE_SCHEMA FROM QSYS2/SYSCOLUMNS
+   WHERE TABLE_SCHEMA = VOTRE_BIBLIOTHEQUE
+   and IS_IDENTITY='YES' for read only;
+
+Exec Sql
+  Open curseur;
+
+Exec Sql
+  FETCH curseur into :LaTable, :LeChamp, :Labib;
+
+Dow sqlstt = '00000';
+
+   // Récupération de l'ID en dynamique (seulement possible par un curseur....
+   requete = 'SELECT max(' + %trim(LeChamp) +
+             ') + 1 FROM ' + %trim(Labib) + '.' + %trim(LaTable);
+   Exec sql
+      PREPARE P1 from :requete;
+
+   Exec SQL
+      DECLARE C1 cursor for P1;
+
+   Exec Sql
+      Open C1;
+
+   Exec Sql
+      Fetch C1 into :ValeurID;
+
+   Exec Sql
+      Close C1;
+
+   if valeurID > 1;
+      // Affectation  de l'ID en dynamique
+      requete = 'ALTER TABLE ' + %trim(Labib) +'.' + %trim(LaTable) +
+                ' ALTER COLUMN '+ %trim(LeChamp) + ' RESTART WITH ' + %char(ValeurID);
+
+      Exec SQL PREPARE DynUpdate from :requete;
+
+      Exec SQL EXECUTE DynUpdate;
+   Endif;
+   // -----------------------------------------------------------------
+
+   Exec Sql
+     FETCH curseur into :LaTable, :LeChamp, :Labib;
+
+Enddo;
+
+Exec Sql
+   Close Curseur;
+
+// Fin du programme
+*inlr = *on;
+
+ 

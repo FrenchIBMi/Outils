@@ -1,0 +1,88 @@
+/************************************************************************/
+/* exemple d'utilisation de l'API iconv pour convertir EBCDIC en UNICODE*/
+/* doit être de type CLLE et V7R2 minumum (pour %LEN en autre)          */
+/************************************************************************/
+
+PGM        PARM(&P1 &P1LEN &P2)
+             DCLPRCOPT  ALWRTVSRC(*YES) BNDDIR(QC2LE)
+
+             dcl &p1 *char 2000
+             dcl &p1len *dec (15 5)
+             dcl &p2 *char 4000
+             dcl &p2len *dec (15 5)
+
+             DCL        VAR(&HANDLE) TYPE(*CHAR) LEN(52)
+              DCL        VAR(&RETOUR) TYPE(*INT) STG(*DEFINED) LEN(4) +
+                           DEFVAR(&HANDLE 1)
+              DCL        VAR(&cd) TYPE(*CHAR) STG(*DEFINED) LEN(48) +
+                           DEFVAR(&HANDLE 5)
+
+             DCL        VAR(&from) TYPE(*CHAR) LEN(32)
+              DCL        VAR(&FROMCCSID) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&FROM 1)
+              DCL        VAR(&FROMconV) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&FROM 5)
+              DCL        VAR(&FROMSUBS) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&FROM 9)
+              DCL        VAR(&FROMSHIFT) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&FROM 13)
+              DCL        VAR(&FROMLEN) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&FROM 17)
+              DCL        VAR(&FROMerr) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&FROM 21)
+              DCL        VAR(&FROMres) TYPE(*char) STG(*DEFINED) +
+                           LEN(8) DEFVAR(&FROM 25)
+
+             DCL        VAR(&to) TYPE(*CHAR) LEN(32)
+              DCL        VAR(&toCCSID) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&to 1)
+              DCL        VAR(&toCONV) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&to 5)
+              DCL        VAR(&toSUBS) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&to 9)
+              DCL        VAR(&toSHIFT) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&to 13)
+              DCL        VAR(&toLEN) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&to 17)
+              DCL        VAR(&toerr) TYPE(*INT) STG(*DEFINED) +
+                           LEN(4) DEFVAR(&to 21)
+              DCL        VAR(&TORES) TYPE(*CHAR) STG(*DEFINED) LEN(8) +
+                          DEFVAR(&TO 25)
+ /* divers */
+             DCL        VAR(&DATA) TYPE(*CHAR) LEN(2000)
+             DCL        VAR(&PDATA) TYPE(*PTR) ADDRESS(&DATA)
+             DCL        VAR(&DATALEN) TYPE(*UINT) LEN(4)
+             DCL        VAR(&rt) TYPE(*CHAR) LEN(4000)
+             DCL        VAR(&PRT) TYPE(*PTR) ADDRESS(&RT)
+             DCL        VAR(&RTLEN) TYPE(*UINT) LEN(4)
+
+/* EBCDIC */ chgvar &fromccsid 297
+             chgvar &fromconv  0
+             chgvar &fromsubs  0
+             chgvar &fromshift 1
+             chgvar &fromlen   0
+             chgvar &fromerr   1
+             chgvar &fromres   x'0000000000000000'
+/* UTF-16 */ chgvar &toccsid 1200
+             chgvar &toconv    0
+             chgvar &tosubs    0
+             chgvar &toshift   1
+             chgvar &tolen     0
+             chgvar &toerr     1
+             chgvar &tores     x'0000000000000000'
+
+/* initialisation CCSID origine/CCSID destination  */
+             CALLPRC    PRC('QtqIconvOpen') PARM((&TO) (&FROM)) +
+                          RTNVAL(&handle)
+/* conversion */
+             chgvar &data %sst(&p1 1 &p1len)
+             chgvar &datalen %len(&data)
+             chgvar &rtlen %len(&rt)
+             CALLPRC    PRC('iconv') PARM((&HANDLE *BYVAL) (&PDATA) +
+                          (&DATALEN) (&PRT) (&RTLEN))
+             chgvar &p2len (&p1len * 2)
+             chgvar &p2 %sst(&rt 1 &p2len)
+
+/* clôture */
+             CALLPRC    PRC('iconv_close') PARM((&handle))
+ENDPGM 

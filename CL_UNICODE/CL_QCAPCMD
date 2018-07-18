@@ -1,0 +1,47 @@
+/**************************************************************************************/
+/* utilisaiton de l'API QCAPCMD pour passer une commande en unicode                   */
+*/ voir                                                                               */ 
+/* https://www.ibm.com/support/knowledgecenter/en/ssw_ibm_i_73/rbam6/rbam6unicode.htm */
+/**************************************************************************************/
+PGM
+
+             DCL        VAR(&CMD) TYPE(*CHAR) LEN(14) +
+                          VALUE(X'00570052004B00530050004C0046')
+                          /* WRKSPLF en UTF-16 */
+             DCL        VAR(&CMDLEN) TYPE(*INT) LEN(4)
+             DCL        VAR(&OPTBLOCK) TYPE(*CHAR) LEN(20)
+               DCL        VAR(&TYPCMD) TYPE(*INT) STG(*DEFINED) LEN(4) +
+                            DEFVAR(&OPTBLOCK 1)
+               DCL        VAR(&DBCS) TYPE(*CHAR) STG(*DEFINED) LEN(1) +
+                            DEFVAR(&OPTBLOCK 5)
+               DCL        VAR(&prompt) TYPE(*CHAR) STG(*DEFINED) LEN(1) +
+                            DEFVAR(&OPTBLOCK 6)
+               DCL        VAR(&syntax) TYPE(*CHAR) STG(*DEFINED) LEN(1) +
+                            DEFVAR(&OPTBLOCK 7)
+               DCL        VAR(&msgkey) TYPE(*CHAR) STG(*DEFINED) LEN(4) +
+                            DEFVAR(&OPTBLOCK 8)
+               DCL        VAR(&ccsid) TYPE(*int) STG(*DEFINED) LEN(4) +
+                            DEFVAR(&OPTBLOCK 12)
+               DCL        VAR(&res) TYPE(*CHAR) STG(*DEFINED) LEN(5) +
+                            DEFVAR(&OPTBLOCK 16)
+             DCL        VAR(&optLEN) TYPE(*INT) LEN(4)
+             DCL        VAR(&CMDRT) TYPE(*CHAR) LEN(200)
+             DCL        VAR(&CMDRTLEN) TYPE(*INT) LEN(4)
+             DCL        VAR(&RTLEN) TYPE(*INT) LEN(4)
+             DCL        VAR(&ERRCODE) TYPE(*CHAR) LEN(8) +
+                          VALUE(X'0000000000000000')
+
+             CHGVAR     VAR(&CMDLEN) VALUE(%LEN(&CMD))
+             CHGVAR     VAR(&OPTLEN) VALUE(%LEN(&OPTBLOCK))
+             CHGVAR     VAR(&CMDRTLEN) VALUE(%LEN(&CMDRT))
+             CHGVAR     VAR(&res) VALUE(x'0000000000')
+             /* options */
+             chgvar &typcmd 0  /* exécution */
+             chgvar &dbcs 0    /* non, voir CCSID */
+             chgvar &prompt 0  /* jamais, même si ? */
+             chgvar &syntax 0  /* syntaxe OS/400  */
+             chgvar &ccsid 1200/* UTF-16 */
+             CALL       PGM(QCAPCMD) PARM(&CMD &CMDLEN &OPTBLOCK +
+                          &OPTLEN 'CPOP0100' &CMDRT &CMDRTLEN +
+                          &RTLEN &ERRCODE)
+ENDPGM                                                              

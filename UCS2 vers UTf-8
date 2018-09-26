@@ -1,0 +1,82 @@
+       // conversion d'une chaine UCS2 en UTF-8
+
+       dcl-proc ucs2_to_utf8;
+
+         dcl-pi ucs2_to_utf8 varchar(5000);
+           data varucs2(10000) const;
+         END-PI;
+
+         dcl-s val ucs2(10000);
+         dcl-s xformtype int(10) inz(1);
+         dcl-s inbuf pointer;
+         dcl-s outbuf pointer;
+         dcl-s inbytesleft uns(10);
+         dcl-s outbytesleft uns(10);
+         dcl-s retval char(50000);
+         dcl-s outspacereq uns(10);
+         dcl-s p_errno pointer;
+         dcl-s Errnum int(10) based(p_errno);
+         dcl-s Meserr varchar(52);
+
+         dcl-pr sys_errno pointer extproc('__errno') end-pr;
+         
+         Dcl-pr strerror  pointer  Extproc('strerror');
+           numerr int(10) value;
+         END-PR;
+
+         dcl-pr  QlgTransformUCSData  int(10) extproc('QlgTransformUCSData') ;
+           xformtype int(10) value;
+           inbuf pointer;
+           inbytesleft uns(10);
+           outbuf pointer;
+           outbytesleft uns(10);
+           outspacereq uns(10);
+         END-PR;
+
+         // xformtype : type de transformation
+         //  1 : UCS2 vers UTF-8
+         //  2 : UTF-8 vers UCS2
+         // autres valeurs possible par combinaison des valeurs du tableau suivant :
+         // --------------------------------------------------
+         //! Transformation ! origine!       destination      !
+         //!                !        !   avec BOM  !  sans BOM!
+         // --------------------------------------------------
+         //! Autodetect     !   010  !             !          !
+         //! UTF-32 BE      !   020  !    021      !   022    !
+         //! UTF-32 LE      !   030  !    031      !   032    !
+         //! UTF-16 BE      !   040  !    041      !   042    !
+         //! UTF-16 LE      !   050  !    051      !   052    !
+         //! UTF-8          !   060  !    061      !   062    !
+         // --------------------------------------------------
+
+         // exemple conversion d'UTF-16LE vers UTF-8 sans BOM
+         //  xformtype = 050062
+
+         // inbuf : pointeur contenant la chaine a convertir  (max  16773104)
+         // inbytesleft : nombre d'octects contenu dans inbuf
+         // outbuf : pointeur de la chaine convertie  (max  16773104)
+         // outbytesleft : nombre d'octects la contenu dans outbuf
+         // outspacereq :
+         // valeur de retour
+         // 0 : succes le contenu de Inbuf a été intégralement transformé
+         // <>0 : erreur
+
+         val=data;
+         inbuf=%addr(val);
+         inbytesleft=%len(data)*2;
+         if inbytesleft=0;
+           return'';
+         ENDIF;
+ 
+         outbuf=%addr(retval);
+         outbytesleft=%size(retval);
+         if QlgTransformUCSData(xformtype:inbuf:inbytesleft:outbuf:outbytesleft:
+           outspacereq)<>0;
+           p_errno = sys_errno;
+           Meserr=%str(strerror(Errnum));
+           dsply (Meserr);
+           return '';
+         endif;
+
+         return %trim(retval);
+       END-PROC;

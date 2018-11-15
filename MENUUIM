@@ -1,0 +1,279 @@
+.* ----------------------------------------------------------------- *
+.*                                                                   *
+.*  Squelette pour création d'un menu UIM                            *
+.*                                                                   *
+.*  Prévoit:                                                         *
+.*    5 options pour le menu avec leur aide spécifique               *
+.*    Vous pouvez mettre plus de cinq options mais si vous           *
+.*    dépassez 17 il vous faudra changer SCROLL=NO en SCROLL=YES     *
+.*                                                                   *
+.* ----------------------------------------------------------------- *
+:PNLGRP.
+.* -----------------------------------------------------------------
+.* Copyright affiché pour le premier affichage
+.* -----------------------------------------------------------------
+:COPYR.
+<texte du copyright Volubis/2018.>
+.*
+.* -----------------------------------------------------------------
+.* UIM Z-variable utilisé pour identifier le panel de groupe
+.* -----------------------------------------------------------------
+:VAR      NAME=ZMENU.
+.*
+.* -----------------------------------------------------------------
+.* Définition des touches de fonctions du menu
+.* -----------------------------------------------------------------
+:KEYL     NAME=menukeys
+          HELP=keyl.
+:KEYI     KEY=F1
+          HELP=helpf1
+          ACTION=HELP.
+:KEYI     KEY=F3
+          HELP=exit
+          ACTION='EXIT SET'
+          VARUPD=NO.
+F3=Exit
+:KEYI     KEY=F4
+          HELP=prompt
+          ACTION=PROMPT.
+F4=Invite
+:KEYI     KEY=F9
+          HELP=retrieve
+          ACTION=RETRIEVE.
+F9=Rappel
+:KEYI     KEY=F12
+          HELP=cancel
+          ACTION='CANCEL SET'
+          VARUPD=NO.
+F12=annuler.
+:KEYI     KEY=ENTER
+          HELP=enter
+          ACTION=ENTER.
+:KEYI     KEY=HELP
+          HELP=help
+          ACTION=HELP.
+:KEYI     KEY=HOME
+          HELP=home
+          ACTION=HOME.
+:KEYI     KEY=PAGEDOWN
+          HELP=pagedown
+          ACTION=PAGEDOWN.
+:KEYI     KEY=PAGEUP
+          HELP=pageup
+          ACTION=PAGEUP.
+:KEYI     KEY=PRINT
+          HELP=print
+          ACTION=PRINT.
+:EKEYL.
+.*
+.* -----------------------------------------------------------------
+.* Définition du menu
+.* -----------------------------------------------------------------
+:PANEL    NAME=xmpmenu
+          HELP='menu/help'
+          KEYL=menukeys
+          ENTER='MSG CPD9817 QCPFMSG'
+          PANELID=ZMENU
+          TOPSEP=SYSNAM.
+Menu UIM d'exemple
+.*
+.* -------------------------------------
+.* Definir l'espace du menu
+.* -------------------------------------
+:MENU     DEPTH='*'
+          SCROLL=NO
+          BOTSEP=SPACE.
+:TOPINST.Sélectionnez une des options suivantes:
+.* ------------------------------------------------------------------ *
+.*                                                                    *
+.* Action effectuée par chaque  OPTION                                *
+.*                                                                    *
+.* -------------------------------------------------------------------*
+:MENUI    OPTION=1
+          ACTION='CMD WRKACTJOB'
+          HELP='menu/option1'.
+Travaux actifs
+:MENUI    OPTION=2
+          ACTION='CMD WRKSPLF'
+          HELP='menu/option2'.
+Vos spools
+:MENUI    OPTION=3
+          ACTION='CMD ?WRKMSG'
+          HELP='menu/option3'.
+Vos messages
+:MENUI    OPTION=4
+          ACTION='CMD CALL QEZSNDMG'
+          HELP='menu/option4'.
+Envoi de message par assistant.
+:MENUI    OPTION=5
+          ACTION='MENU MAJOR'
+          HELP='menu/option5'.
+Menu d'accès à toutes les commandes
+.*
+:EMENU.
+.*
+.* ----------------------------------------------------------------- *
+.* permet d'utiliser une ligne de commande grand format              *
+.* ----------------------------------------------------------------- *
+:CMDLINE  SIZE=LONG.
+Selection ou commande
+.*
+:EPANEL.
+.*
+.* -----------------------------------------------------------------
+.* Définition des aides pour le menu, touches de fonctions
+.* -----------------------------------------------------------------
+:HELP     NAME=keyl.
+Aide pour les touches de fonction
+:XH3.Touches de fonction
+:EHELP.
+.*
+:HELP     NAME=helpf1.
+:PARML.
+:PT.F1=Aide
+:PD.
+Informations complémentaires sur l'utilisation de cet écran ou sur les
+zones de cet écran.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=exit.
+:PARML.
+:PT.F3=Exit
+:PD.
+Arrêt de la tâche en cours d'exécution et retour à la tâche précédente.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=prompt.
+:PARML.
+:PT.F4=Invite
+:PD.
+Permet d'utiliser l'invite ou la sélection de commande.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=retrieve.
+:PARML.
+:PT.F9=Rappel
+:PD.
+Affiche la dernière commande que vous avez entré avec les paramètres
+que vous avez choisi. Si vous appuyez a nouveau sur la touche vous
+aurez la commande précédente et ainsi de suite.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=cancel.
+:PARML.
+:PT.F12=Retour
+:PD.
+Retourne a l'écran précédent.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=morekeys.
+:PARML.
+:PT.F24=Autres touches
+:PD.
+Permet d'afficher les autres touches de fonction disponibles.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=enter.
+:PARML.
+:PT.ENTRER
+:PD.
+Permet de valider une saisie.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=help.
+:PARML.
+:PT.Help
+:PD.
+Permet d'afficher l'aide concernant le menu ou une option du menu.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=home.
+:PARML.
+:PT.Home
+:PD.
+Pour avoir ce menu comme menu initial placer le dans votre profil
+dans le paramètre INLMNU(  ).
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=pagedown.
+:PARML.
+:PT.Page Down (Roll Up)
+:PD.
+Affiche la page suivante des options du menu.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=pageup.
+:PARML.
+:PT.Page Up (Roll Down)
+:PD.
+Affiche la page précédente des options du menu.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME=print.
+:PARML.
+:PT.Print
+:PD.
+Imprime les informations affichées sur l'écran.
+:EPARML.
+:EHELP.
+.*
+:HELP     NAME='menu/help'.
+Aide du menu.
+:P.
+Aide sur l'utilisation du menu.
+:XH3.
+Comment utiliser ce menu:
+:P.
+Pour sélectionner une option entrez le numéro de l'option et appuyez
+sur entrer.
+:P.
+Pour lancer une commande Tapez la commande et appuyer sur entrer, si
+vous désirez l'invite, appuyer sur la touche de fonction F4 (Invite).
+Vous pouvez de l'aide par la touche de fonction F1 ou HELP .
+vous pouvez rappeler une commande en appuyante sur F9 (Rappel).
+:EHELP.
+.* ------------------------------------------------------------------ *
+.* Aide des options                                                   *
+.* -------------------------------------------------------------------*
+:HELP     NAME='menu/option1'.
+Option 1 - Aide
+:XH3.Option 1.
+:P.
+Commande WRKACTJPOB, montre tous les travaux actifs
+:EHELP.
+:HELP     NAME='menu/option2'.
+Option 2 - Aide
+:XH3.Option 2.
+:P.
+Voir vos spools.
+:EHELP.
+:HELP     NAME='menu/option3'.
+Option 3 - Aide
+:XH3.Option 3.
+:P.
+Voir vos messages.
+:EHELP.
+:HELP     NAME='menu/option4'.
+Option 4 - Aide
+:XH3.Option 4.
+:P.
+API d'assitant pour envoyer des messages.
+:EHELP.
+:HELP     NAME='menu/option5'.
+Option 5 - Aide
+:XH3.Option 5.
+:P.
+Menu MAJOR , permet de d'accèder à toutes les commandes
+:EHELP.
+:EPNLGRP. 

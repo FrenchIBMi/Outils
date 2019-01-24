@@ -1,0 +1,23 @@
+**free
+ctl-opt nomain;
+dcl-proc signal export;
+  dcl-pi *n;
+    message char(80) CONST;
+  END-PI;
+  dcl-pr QMHSNDPM EXTPGM;
+    msgid char(7)   CONST;
+    msgf  char(20)  CONST;
+    msgdta char(80) CONST;
+    msgdtal int(10) CONST;
+    msgtyp char(10) CONST;
+    callstack char(10) CONST;
+    callcount INT(10) CONST;
+    msgkey    CHAR(4);
+    erreur    likeds(erreurDS);
+  END-PR;
+  dcl-s cle char(4);
+  erreurds.errlg = 16;
+  // envoi un message d'erreur deux crans au dessus (paramètre "callcount")
+  QMHSNDPM('CPF9898' : 'QCPFMSG   QSYS': message : %len(%trimr(message)) :
+            '*ESCAPE': '*' : 2 : cle : erreurDS);
+END-PROC;                                                

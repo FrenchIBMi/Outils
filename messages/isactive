@@ -1,0 +1,44 @@
+**free
+ctl-opt NOMAIN;
+//exemple d'utilisation
+//if isactive('QUSCMDLN');
+//  dsply 'QUSCMDLN est actif';
+//else;
+//  dsply 'QUSCMDLN non trouvé';
+//endif;                            
+DCL-PROC isactive export;
+dcl-pi *n IND;
+ pgm  char(10) const;
+end-pi;
+//*  variables locales
+Dcl-s KEY  INt(10);
+
+Dcl-ds CODERR;
+ LGCOD   int(10)   INZ(16);
+ LGUTIL  int(10);
+ MSGID   CHAR(7);
+ FILLER CHAR(1);
+end-ds;
+// API
+dcl-pr QMHSNDPM EXTPGM;
+  *n CHAR(7)  CONST; // MSGID
+  *n CHAR(20) CONST; // MSGF
+  *n CHAR(10) CONST; // texte du message
+  *n INT(10) CONST; // lg du texte
+  *n CHAR(10) CONST; // msg type
+  *n CHAR(10) const; // PGMQ
+  *n INT(10)  CONST; // stack
+  *n INT(10); // key
+  *n likeds(coderr);
+End-Pr;
+//
+//  on envoi un message au programme demandé (stack = 0)
+//  si erreur le pgm n'est pas actif
+
+QMHSNDPM(' ': ' ' :'peu importe' : 10 : '*INFO' : pgm : 0 : key : coderr);
+if msgid = ' ';
+ return    *on;
+else;
+  return *off;
+EndIf;
+End-proc; 

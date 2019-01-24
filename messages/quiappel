@@ -1,0 +1,66 @@
+**free
+ctl-opt NOMAIN;
+// exemple d'utilisation
+//dcl-s nom char(10);
+//nom  = quiappel(1);       
+//* corps de la fonction
+DCL-PROC quiappel export;
+dcl-pi *n CHAR(10);
+niveau int(10) const;
+end-pi;
+//*  variables locales
+dcl-s binaire int(10);
+
+Dcl-s LENTXT  like(binaire);
+Dcl-s STACK   like(binaire);
+Dcl-s KEY     like(binaire);
+dcl-s retour char(120);
+dcl-s ID CHAR(7);
+
+Dcl-ds CODERR;
+ LGCOD   like(binaire)   INZ(16);
+ LGUTIL  like(binaire);
+ MSGID   CHAR(7);
+ FILLER CHAR(1);
+end-ds;
+// API
+dcl-pr QMHSNDPM EXTPGM;
+  *n CHAR(7)  CONST; // MSGID
+  *n CHAR(20) CONST; // MSGF
+  *n CHAR(10) CONST; // texte du message
+  *n INT(10) CONST; // lg du texte
+  *n CHAR(10) CONST; // msg type
+  *n CHAR(10) CONST; // PGMQ
+  *n INT(10); // stack
+  *n INT(10); // key
+  *n likeds(coderr);
+End-Pr;
+dcl-pr QMHRCVPM EXTPGM;
+  *n CHAR(120) ; // data en retour
+  *n int(10) CONST; // lg data
+  *n CHAR(8) CONST; // format
+  *n CHAR(10) CONST; // PGMQ
+  *n INT(10); // stack
+  *n CHAR(10) CONST; // msg type
+  *n INT(10); // key
+  *n INT(10) CONST; // temps d'attente
+  *n CHAR(10) CONST; // action *KEEP/*REMOVE
+  *n likeds(coderr);
+End-Pr;
+
+//
+//  on envoi un message au programme au-dessus (stack=empilement)
+//  et on le relit.
+//   (dans les infos retournées il y a le nom du pgm qui a recu en 111)
+//
+
+// on rajoute 2 pour tenir compte de la place occupée par le pgm
+// utilisant lui même la fonction ET de la place du PEP (entry point : ILE)
+
+stack = niveau + 2;
+
+QMHSNDPM(ID : ' ' :'peu importe' : 10 : '*INFO' : '*' :stack : key : coderr);
+QMHRCVPM(retour : %len(retour) : 'RCVM0200' : '*' : stack : '*ANY'  : key :
+         0 : '*REMOVE' : coderr);
+ return    %subst(retour:111:10);
+End-proc; 

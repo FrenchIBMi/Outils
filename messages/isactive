@@ -33,7 +33,7 @@ dcl-pr QMHSNDPM EXTPGM;
 End-Pr;
 //
 //  on envoi un message au programme demandé (stack = 0)
-//  si erreur le pgm n'est pas actif
+//  si erreur le pgm n'est pas actif, on recoit une erreur
 
 QMHSNDPM(' ': ' ' :'peu importe' : 10 : '*INFO' : pgm : 0 : key : coderr);
 if msgid = ' ';

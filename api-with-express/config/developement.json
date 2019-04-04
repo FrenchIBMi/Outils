@@ -1,0 +1,11 @@
+{
+    "port": 8085,
+    "port_secure": 8443,
+    "db": {
+        "debug": true
+    },
+    "appname": "api-with-express",
+    "schema": "cil",
+    "secret": "THIS IS USED TO SIGN AND VERIFY JWT TOKENS, REPLACE IT WITH YOUR OWN SECRET, IT CAN BE ANY STRING",
+    "jwt_option": { "expiresIn": "15h", "issuer": "https://cil-lamballe.com" }
+}

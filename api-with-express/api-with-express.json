@@ -1,0 +1,340 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "API with Express",
+    "description": "API sécurisé avec le framework Express.",
+    "contact": {
+      "email": "s.bourreau@cil-lamballe.com"
+    },
+    "license": {
+      "name": "Apache 2.0",
+      "url": "http://www.apache.org/licenses/LICENSE-2.0.html"
+    },
+    "version": "1.0.0"
+  },
+  "externalDocs": {
+    "description": "Find out more about Swagger",
+    "url": "http://swagger.io"
+  },
+  "servers": [
+    {
+      "url": "https://localhost:8443/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "login",
+      "description": "Authentification"
+    },
+    {
+      "name": "customers",
+      "description": "Accès aux données"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "tags": [
+          "login"
+        ],
+        "summary": "Connexion à l'IBMi",
+        "description": "Connexion avec un utilisateur valide.",
+        "operationId": "login",
+        "requestBody": {
+          "description": "Utilisateur / mot de passe valide",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/User"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Token"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/customers": {
+      "get": {
+        "tags": [
+          "customers"
+        ],
+        "summary": "Liste des customers",
+        "operationId": "listCustomer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Authentication error. Invalid Token.",
+            "content": {}
+          },
+          "default": {
+            "description": "successful operation",
+            "headers": {
+              "x-access-token": {
+                "description": "Token valide",
+                "schema": {
+                  "type": "string",
+                  "format": "bearer"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "customers"
+        ],
+        "summary": "Création d'un customer",
+        "description": "This can only be done by the logged in user.",
+        "operationId": "createCustomer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "description": "Données à créer",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    },
+    "/customers/{id}": {
+      "get": {
+        "tags": [
+          "customers"
+        ],
+        "summary": "Retourne un customer par son code",
+        "operationId": "findCustomer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Le code du customer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "successful operation",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Customer"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Authentication error. Invalid Token.",
+            "content": {}
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "customers"
+        ],
+        "summary": "Suppression d'un customer",
+        "operationId": "deleteCustomer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Le code du customer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "401": {
+            "description": "Authentication error. Invalid Token.",
+            "content": {}
+          },
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "customers"
+        ],
+        "summary": "Mise à jour d'un customer",
+        "operationId": "updateCustomer",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Le code du customer",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "description": "Données à mettre à jour",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/Customer"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "401": {
+            "description": "Authentication error. Invalid Token.",
+            "content": {}
+          },
+          "default": {
+            "description": "successful operation",
+            "content": {}
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "User": {
+        "type": "object",
+        "properties": {
+          "profile": {
+            "type": "string",
+            "description": "Profile utilisateur IBMi"
+          },
+          "password": {
+            "type": "string",
+            "description": "Mot de passe utilisateur IBMi"
+          }
+        }
+      },
+      "Customer": {
+        "type": "object",
+        "properties": {
+          "CUSNUM": {
+            "type": "integer",
+            "description": "Customer number"
+          },
+          "LSTNAM": {
+            "type": "string",
+            "description": "Last name"
+          },
+          "INIT": {
+            "type": "string",
+            "description": "First and middle initial"
+          },
+          "STREET": {
+            "type": "string",
+            "description": "Street address"
+          },
+          "CITY": {
+            "type": "string",
+            "description": "City"
+          },
+          "STATE": {
+            "type": "string",
+            "description": "State abbreviation"
+          },
+          "ZIPCOD": {
+            "type": "integer",
+            "description": "Zip code"
+          },
+          "CDTLMT": {
+            "type": "integer",
+            "description": "Credit limit"
+          },
+          "CHGCOD": {
+            "type": "integer",
+            "description": "Charge code"
+          },
+          "BALDUE": {
+            "type": "integer",
+            "description": "Balance due"
+          },
+          "CDTDUE": {
+            "type": "integer",
+            "description": "Credit due"
+          }
+        }
+      },
+      "Token": {
+        "type": "object",
+        "properties": {
+          "auth": {
+            "type": "boolean"
+          },
+          "token": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

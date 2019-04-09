@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+"use strict";
+
+/**
+ * Node Version > v8
+ * use the new db2 connector
+ */
+
+const http = require("http");
+const api = require("..");
+const config = require('config');
+const os = require('os');
+const debug = require('debug')('http');
+const host_name = process.argv[4] || os.hostname();
+const port = config.get('port');
+const fs = require('fs')
+const https = require('https')
+// $ openssl genrsa -out api-with-express-key.pem 2048
+// $ openssl req -new -sha256 -key api-with-express-key.pem -out api-with-express-csr.pem
+// $ openssl x509 -req -in api-with-express-csr.pem -signkey api-with-express-key.pem -out api-with-express-cert.pem
+const options = {
+  key: fs.readFileSync('./api-with-express-key.pem'),
+  cert: fs.readFileSync('./api-with-express-cert.pem')
+}
+const port_secure = config.get('port_secure');
+
+api().then(app => {
+  http.createServer(function(req, res) {
+    const new_loc = 'https://' + host_name + ':' + port_secure
+    console.log('new_loc:%s', new_loc)
+    res.writeHead(301,
+      {Location: new_loc}
+    );
+    res.end();
+  }).listen(port);
+
+  const server = https.createServer(options, app).listen(port_secure);
+
+  debug(`App Listening @ ${host_name}:${port_secure}`);
+});

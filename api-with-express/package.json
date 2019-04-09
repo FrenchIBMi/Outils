@@ -1,0 +1,53 @@
+{
+  "name": "api-with-nodejs",
+  "version": "1.0.0",
+  "description": "An API with Express",
+  "main": "index.js",
+  "scripts": {
+    "start": "NODE_ENV=production node ./bin/start",
+    "watch": "NODE_ENV=developement DEBUG='http,route,services,utils' nodemon ./bin/start",
+    "lint": "eslint *.js",
+    "pretest": "NODE_ENV=test npm run lint"
+  },
+  "keywords": [],
+  "author": "Sébastien BOURREAU <s.bourreau@cil-lamballe.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=8.9.0"
+  },
+  "devDependencies": {
+    "eslint": "^4.11.0",
+    "eslint-config-prettier": "^2.8.0",
+    "eslint-plugin-import": "^2.8.0",
+    "eslint-plugin-node": "^5.2.1",
+    "eslint-plugin-prettier": "^2.3.1",
+    "eslint-plugin-promise": "^3.6.0",
+    "nodemon": "^1.12.1",
+    "prettier": "^1.8.2"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "bunyan": "^1.8.12",
+    "config": "^3.0.1",
+    "cors": "^2.8.4",
+    "debug": "^4.1.1",
+    "express": "^4.16.2",
+    "helmet": "^3.16.0",
+    "idb-pconnector": "^1.0.4",
+    "itoolkit": "^0.1.6",
+    "jsonwebtoken": "^8.5.1"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules"
+    ],
+    "verbose": true,
+    "watch": [
+      "src"
+    ],
+    "legacyWatch": true,
+    "ext": "js,json"
+  }
+}

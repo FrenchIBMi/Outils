@@ -13,7 +13,18 @@ module.exports = ({ MissingResourceError, ValidationError, NoDataError }) => {
       const statement = new Statement(connection);
       // await statement.exec("SET SCHEMA QIWS") 
       // const sql = `SELECT LSTNAM, CUSNUM FROM QCUSTCDT order by ${sort} ASC`;
-      let sql = `SELECT * FROM ${schema}.QCUSTCDT`;
+      let sql = `SELECT CUSNUM 
+      , trim(LSTNAM) LSTNAM
+      , trim(INIT)   INIT
+      , trim(STREET) STREET
+      , trim(CITY)   CITY
+      , trim(STATE)  STATE
+      , ZIPCOD 
+      , CDTLMT 
+      , CHGCOD 
+      , BALDUE 
+      , CDTDUE
+      FROM ${schema}.QCUSTCDT`;
       if (sort) {
         sql += ` order by ${sort}`
       }
@@ -56,7 +67,19 @@ module.exports = ({ MissingResourceError, ValidationError, NoDataError }) => {
       const connection = new Connection({ url: '*LOCAL' });
       const statement = new Statement(connection);
       // await statement.exec("SET SCHEMA QIWS") 
-      const sql = `SELECT * FROM ${schema}.QCUSTCDT where CUSNUM='${id}'`;
+      const sql = `SELECT CUSNUM 
+      , trim(LSTNAM) LSTNAM
+      , trim(INIT)   INIT
+      , trim(STREET) STREET
+      , trim(CITY)   CITY
+      , trim(STATE)  STATE
+      , ZIPCOD 
+      , CDTLMT 
+      , CHGCOD 
+      , BALDUE 
+      , CDTDUE 
+      FROM ${schema}.QCUSTCDT 
+      where CUSNUM='${id}'`;
       await statement.prepare(sql);  
       await statement.execute();
       customer = await statement.fetchAll();
@@ -82,39 +105,19 @@ module.exports = ({ MissingResourceError, ValidationError, NoDataError }) => {
       const connection = new Connection({ url: '*LOCAL' });
       const statement = new Statement(connection);
       // await statement.exec("SET SCHEMA CIL") 
-      let sql = `UPDATE ${schema}.QCUSTCDT SET `;
-      if (data.LSTNAM){
-        sql += `LSTNAM='${data.LSTNAM}' `
-      }
-      if (data.INIT){
-        sql += `INIT='${data.INIT}' `
-      }
-      if (data.STREET){
-        sql += `STREET='${data.STREET}' `
-      }
-      if (data.CITY){
-        sql += `CITY='${data.CITY}' `
-      }
-      if (data.STATE){
-        sql += `STATE='${data.STATE}' `
-      }
-      if (data.ZIPCOD){
-        sql += `ZIPCOD='${data.ZIPCOD}' `
-      }
-      if (data.CDTLMT){
-        sql += `CDTLMT='${data.CDTLMT}' `
-      }
-      if (data.CHGCOD){
-        sql += `CHGCOD='${data.CHGCOD}' `
-      }
-      if (data.BALDUE){
-        sql += `BALDUE='${data.BALDUE}' `
-      }
-      if (data.CDTDUE){
-        sql += `CDTDUE='${data.CDTDUE}' `
-      }
-      
-      sql += `WHERE CUSNUM='${id}' with nc`;
+      let sql = `UPDATE ${schema}.QCUSTCDT SET 
+      LSTNAM='${data.LSTNAM}'
+      , INIT='${data.INIT}' 
+      , STREET='${data.STREET}' 
+      , CITY='${data.CITY}' 
+      , STATE='${data.STATE}' 
+      , ZIPCOD=${data.ZIPCOD}
+      , CDTLMT=${data.CDTLMT}
+      , CHGCOD=${data.CHGCOD}
+      , BALDUE=${data.BALDUE}
+      , CDTDUE=${data.CDTDUE} `;
+
+      sql += `WHERE CUSNUM=${id} with nc`;
       debug("SQL ", sql)   
       await statement.prepare(sql);  
       await statement.execute();

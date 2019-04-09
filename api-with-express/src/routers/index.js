@@ -17,6 +17,7 @@ module.exports = (services, exceptions) => {
       app.get("/customers", customersRouter.list);
       app.get("/customers/:id", customersRouter.find);
       app.patch("/customers/:id", customersRouter.update);
+      app.put("/customers/:id", customersRouter.update);
       app.delete("/customers/:id", customersRouter.remove);
 
     }

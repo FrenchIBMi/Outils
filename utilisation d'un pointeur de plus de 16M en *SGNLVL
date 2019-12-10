@@ -1,0 +1,47 @@
+**FREE
+//**********************************************************************************
+// Exemple de création d'un pointeur RPG de plus de 16Mo (2Go max) en mode *SNGLVL *
+//**********************************************************************************
+ctl-opt dftactgrp(*No) actgrp(*caller) bnddir('QC2LE');
+//***************************************************
+//Prototypes
+//***************************************************
+//allocation mémoire
+dcl-pr ts_malloc pointer extproc('_C_TS_malloc');
+  *n uns(10) value;
+end-pr;
+//libération mémoire
+dcl-pr ts_free  extproc('_C_TS_free');
+  *n pointer value;
+end-pr;
+//Réallocation mémoire
+dcl-pr ts_realloc pointer extproc('_C_TS_realloc');
+  *n pointer value;
+  *n uns(10) value;
+end-pr;
+//***************************************************
+//***************************************************
+// zone isolées
+dcl-s pointeur pointer;
+dcl-s len uns(10);
+
+dcl-s  car13 char(13) based(Ptr);
+dcl-s i uns(10);
+//*****************************************************
+len=1073741824;           //1Go 1024*1024*1024
+pointeur=ts_malloc(len);  //initialisation pointer 1Go
+// chargement du pointeur
+ptr=pointeur;
+for i=1 TO len by 13;
+  car13='Ceci est test';
+  ptr+=13;
+endfor;
+
+car13='';
+//lecture du pinture a la position 100 MO
+ptr=pointeur+104857600;
+//affichage résultat
+dsply car13;
+//libération mémoire
+ts_free(pointeur);
+*inlr=*on; 

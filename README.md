@@ -1,2 +1,2 @@
 # PLB
-Outil pour créer des dépendances entre des jobs  
+Exemples d'outils pour IBMi

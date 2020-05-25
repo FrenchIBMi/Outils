@@ -1,1 +1,1 @@
-quelques exemples d'utilisaiton des API "message"
+quelques exemples d'utilisation des API "message"

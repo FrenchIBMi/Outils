@@ -1,1 +1,1 @@
-DSPEXITPGM : affiche les pogrammes attachés aux point d'exit.
+DSPEXITPGM : affiche les programmes attachés aux point d'exit.

@@ -4,9 +4,10 @@
      D fd              S             10I 0
      D flags           S             10U 0
      D mode            S             10U 0
-     D*CRLF            C                   const(x'0d25')                       Fin de ligne
-     D CR              C                   const(x'0d13')                       Retour à la ligne
-     D TAB             C                   const(x'0d09')                       Tabulation Horizontale
+     D CRLF            C                   const(x'0d25')                       Retour chariot + Fin de ligne 
+     D CR              C                   const(x'0d')                         Retour chariot  
+     D LF              C                   const(x'25')                         Fin de ligne
+     D TAB             C                   const(x'05')                         Tabulation Horizontale
      D**********************************************************************
      D*  Flags for use in open()
      D*

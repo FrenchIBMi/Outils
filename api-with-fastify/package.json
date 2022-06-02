@@ -1,0 +1,39 @@
+{
+  "name": "api-with-fastify",
+  "version": "0.0.1",
+  "description": "Squelette d'API avec Fastify et documentation OpenAPI",
+  "main": "server.js",
+  "dependencies": {
+    "config": "^3.3.6",
+    "debug": "^4.3.2",
+    "fastify": "^3.20.1",
+    "fastify-swagger": "^4.8.4",
+    "fluent-json-schema": "^3.0.1",
+    "odbc": "^2.4.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.12"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "NODE_ENV=developement DEBUG=server:* nodemon --inspect server.js",
+    "start": "NODE_ENV=production node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "nodemonConfig": {
+    "restartable": "rs",
+    "ignore": [
+      ".git",
+      "node_modules/**/node_modules",
+      "README.MD"
+    ],
+    "verbose": true,
+    "watch": [
+      "."
+    ],
+    "legacyWatch": true,
+    "ext": "js,json"
+  }
+}

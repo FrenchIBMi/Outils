@@ -1,0 +1,8 @@
+{
+    "server": {
+        "host": "gigctest",
+        "port": 8095,
+        "dsn": "DSN=*LOCAL;CCSID=1208;",
+        "bib": "GPTEST"
+    }
+}

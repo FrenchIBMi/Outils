@@ -251,7 +251,7 @@ dcl-s  pEntry pointer ;
      i_ApplicationCertificate <> APPLICATION_WITH and
      i_ApplicationCertificate <> APPLICATION_WITHOUT ;
     state = '38999' ;
-    message = 'La valeur de APPLICATION_WITHICATE doit être *ALL, *WITH ou *WITHOUT' ;
+    message = 'La valeur de APPLICATION_CERTIFICATE doit être *ALL, *WITH ou *WITHOUT' ;
     return ;
   endif ;
   if i_ApplicationType <> APPLICATION_TYPE_ALL and

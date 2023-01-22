@@ -242,7 +242,7 @@ dcl-s  pEntry pointer ;
   if i_ApplicationCertificate_i = PARM_NULL or
      i_ApplicationType_i = PARM_NULL ;
     state = '38999' ;
-    message = 'Valeur nulle non supportée pour APPLICATION_WITHICATE et APPLICATION_TYPE ' ;
+    message = 'Valeur nulle non supportée pour APPLICATION_CERTIFICATE et APPLICATION_TYPE ' ;
     return ;
   endif ;
 

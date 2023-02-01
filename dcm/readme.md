@@ -8,7 +8,7 @@ Vous pouvez filtrer par type d'application (serveur ou client - objectsigning n'
 1. Compiler les programme LSTDCMAPP.RPGLE
 2. Cataloguer la procédure listedcmapplication
 
-## Utilisation : synytaxes supportées
+## Utilisation : syntaxes supportées
 
 ### Paramètres
 - APPLICATION_CERTIFICATE 

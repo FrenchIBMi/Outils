@@ -306,24 +306,16 @@ dcl-proc getSqlStmt ;
 
     select ;
 
-    when g_Desc( l_cpt ).type = 'CHAR' and g_Desc( l_cpt ).ccsid <> 65535 ;
-      l_sqlStmt += ( ''''''''' || replace(cast(' + l_nomCol + ' as char(' +
-                     %char(g_Desc(l_cpt).length) +
+    when ( g_Desc( l_cpt ).type = 'CHAR' or g_Desc( l_cpt ).type = 'VARCHAR')
+         and g_Desc( l_cpt ).ccsid <> 65535 ;
+      l_sqlStmt += ( ''''''''' || replace(cast(' + l_nomCol + ' as clob(' +
+                     %char(g_Desc(l_cpt).length * 2) +
                         ') ccsid 1208) , '''''''', '''''''''''') || ''''''''' ) ;
 
-    when g_Desc( l_cpt ).type = 'CHAR' and g_Desc( l_cpt ).ccsid = 65535 ;
-      l_sqlStmt += ( ''''''''' || replace(cast(' + l_nomCol + ' as char(' +
-                     %char(g_Desc(l_cpt).length) +
-                        ') ccsid 1147) , '''''''', '''''''''''') || ''''''''' ) ;
-
-    when g_Desc( l_cpt ).type = 'VARCHAR' and g_Desc( l_cpt ).ccsid <> 65535 ;
-     l_sqlStmt += ( ''''''''' || replace(cast(' + l_nomCol + ' as varchar(' +
-                     %char(g_Desc(l_cpt).length) +
-                        ') ccsid 1208) , '''''''', '''''''''''') || ''''''''' ) ;
-
-    when g_Desc( l_cpt ).type = 'VARCHAR' and g_Desc( l_cpt ).ccsid = 65535 ;
-     l_sqlStmt += ( ''''''''' || replace(cast(' + l_nomCol + ' as varchar(' +
-                     %char(g_Desc(l_cpt).length) +
+    when ( g_Desc( l_cpt ).type = 'CHAR' or g_Desc( l_cpt ).type = 'VARCHAR')
+         and g_Desc( l_cpt ).ccsid = 65535 ;
+      l_sqlStmt += ( ''''''''' || replace(cast(' + l_nomCol + ' as clob(' +
+                     %char(g_Desc(l_cpt).length * 2) +
                         ') ccsid 1147) , '''''''', '''''''''''') || ''''''''' ) ;
 
     when g_Desc( l_cpt ).type = 'BIGINT' or
